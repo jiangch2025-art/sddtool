@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>线索创建与管理工作空间</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #F9F9F9;
+      font-size: 13px;
+      color: #333;
+    }
+
+    /* 顶部导航 */
+    .top-bar {
+      height: 44px;
+      background: #F5F7FA;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #555;
+    }
+
+    .top-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* 主布局：左会话 + 右表格 */
+    .main {
+      display: flex;
+      height: calc(100vh - 44px);
+      margin-top: 44px;
+    }
+
+    /* ====================== 左侧会话栏 ====================== */
+    .chat-side {
+      width: 330px;
+      background: #FFF;
+      border-right: 1px solid #E5E7EB;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 会话标签 */
+    .chat-tabs {
+      display: flex;
+      padding: 0 14px;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .chat-tab {
+      padding: 12px 12px 10px;
+      cursor: pointer;
+      color: #666;
+      position: relative;
+    }
+
+    .chat-tab.active {
+      color: #FF8C00;
+      font-weight: 500;
+    }
+
+    .chat-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 12px;
+      right: 12px;
+      height: 2px;
+      background: #FF8C00;
+      border-radius: 1px;
+    }
+
+    /* 会话列表 */
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px;
+    }
+
+    .chat-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #F5F7FA;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #333;
+    }
+
+    .chat-item .domain {
+      color: #007AFF;
+      font-size: 12px;
+    }
+
+    /* 资产提示条 */
+    .asset-tip {
+      background: #F7F8FA;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      margin: 0 14px 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .view-btn {
+      background: #7B61FF;
+      color: #FFF;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      margin: 0 14px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* 会话工具栏 */
+    .chat-toolbar {
+      padding: 6px 14px;
+      font-size: 12px;
+      color: #888;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    /* 命令标签 */
+    .cmd-tag {
+      text-align: right;
+      padding: 0 14px 6px;
+    }
+
+    .cmd-tag span {
+      background: #F1F3F6;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #555;
+    }
+
+    /* 执行过程 */
+    .process-box {
+      margin: 0 14px 10px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .process-head {
+      background: #F7F8FA;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .process-dot {
+      color: #00C853;
+      font-size: 14px;
+    }
+
+    .process-item {
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ok {
+      color: #00C853;
+      margin-right: 4px;
+    }
+
+    /* 底部输入框 */
+    .chat-input-wrap {
+      padding: 10px 14px 14px;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    .chat-input {
+      width: 100%;
+      height: 72px;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      border: 2px solid transparent;
+      background: linear-gradient(#fff, #fff) padding-box,
+                  linear-gradient(90deg, #4096ff, #b37feb) border-box;
+      resize: none;
+      outline: none;
+    }
+
+    .chat-input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .input-left {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-icon {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      background: #FFF;
+    }
+
+    .send-btn {
+      width: 28px;
+      height: 28px;
+      background: #7B61FF;
+      color: #FFF;
+      border-radius: 50%;
+      border: none;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    /* ====================== 右侧内容区 ====================== */
+    .content-side {
+      flex: 1;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      background: #F9F9F9;
+    }
+
+    /* 表格头部 */
+    .table-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .table-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .table-progress {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .table-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .table-btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid #DCDFE6;
+      background: #FFF;
+    }
+
+    .table-btn.primary {
+      background: #FF8C00;
+      color: #FFF;
+      border: none;
+    }
+
+    .table-btn.icon {
+      width: 32px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    /* 搜索框 */
+    .search-input {
+      height: 32px;
+      border: 1px solid #DCDFE6;
+      border-radius: 4px;
+      padding: 0 10px;
+      margin-bottom: 12px;
+      width: 240px;
+      outline: none;
+    }
+
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #FFF;
+      border-radius: 6px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 500;
+      color: #555;
+      background: #F7F8FA;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #F1F3F6;
+    }
+
+    .link {
+      color: #007AFF;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    /* 表格底部 */
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+    }
+
+    .page-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid #DCDFE6;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      background: #FFF;
+      cursor: pointer;
+    }
+
+    .bar {
+      width: 100px;
+      height: 6px;
+      background: #E5E7EB;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 顶部 -->
+  <div class="top-bar">
+    <div class="top-bar-left">线索创建与管理工作空间 ▾</div>
+    <div class="top-bar-right">
+      <div class="top-icon">🗖</div>
+      <div class="top-icon">←</div>
+      <div class="top-icon">→</div>
+      <div style="width:1px;height:18px;background:#E5E7EB;"></div>
+      <div class="top-icon">⚙️</div>
+      <div class="top-icon">🔔</div>
+      <div class="top-icon">📄</div>
+      <div class="top-icon">+</div>
+      <div class="top-icon">✕</div>
+    </div>
+  </div>
+
+  <!-- 主体 -->
+  <div class="main">
+    <!-- 左侧会话 -->
+    <div class="chat-side">
+      <div class="chat-tabs">
+        <div class="chat-tab active">会话</div>
+        <div class="chat-tab">团队</div>
+        <div class="chat-tab">资产</div>
+      </div>
+
+      <div class="chat-list">
+        <div class="chat-item">
+          <span>深圳市能安医疗器械有限公司</span>
+          <span class="domain">nengan.net</span>
+        </div>
+        <div class="chat-item">
+          <span>深圳市好运来医疗器械有限公司</span>
+          <span class="domain">337881.com</span>
+        </div>
+        <div class="chat-item">
+          <span>深圳市德莱尔医疗器械有限公司</span>
+          <span class="domain">delaier.cn</span>
+        </div>
+        <div class="chat-item">
+          <span>深圳市贝斯达医疗器械有限公司</span>
+          <span></span>
+        </div>
+        <div class="chat-item">
+          <span>深圳市康信诺医疗器械有限公司</span>
+          <span class="domain">szcosino.com</span>
+        </div>
+      </div>
+
+      <div class="asset-tip">
+        空间资产已保存: 资产名称 "深圳医疗器械企业（活跃）" 已保存到工作空间, 共 27 家企业。
+      </div>
+
+      <button class="view-btn">点击查看</button>
+
+      <div class="chat-toolbar">
+        <span>内容由AI生成</span>
+        <span>📋</span>
+        <span>👍</span>
+        <span>💬</span>
+        <span>⋯</span>
+      </div>
+
+      <div class="cmd-tag">
+        <span>/查找客户</span>
+      </div>
+
+      <div class="process-box">
+        <div class="process-head">
+          <span>执行过程 ⌃</span>
+          <span class="process-dot">●</span>
+        </div>
+        <div class="process-item">
+          <div><span class="ok">✔</span>识别到场景: marketing-find-customers</div>
+          <span>2.7s</span>
+        </div>
+        <div class="process-item">
+          <div><span class="ok">✔</span>运行完毕</div>
+        </div>
+      </div>
+
+      <div class="chat-input-wrap">
+        <textarea class="chat-input" placeholder="请输入 回车发送 Ctrl+回车换行"></textarea>
+        <div class="chat-input-footer">
+          <div class="input-left">
+            <div class="input-icon">+</div>
+            <div class="input-icon">💡</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:#666">ShareClaude ▾</span>
+            <button class="send-btn">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧表格 -->
+    <div class="content-side">
+      <div class="table-head">
+        <div>
+          <div class="table-title">深圳医疗器械企业（活跃）</div>
+          <div class="table-progress">进度: 存入销售线索 (0%) 数据丰富 (0%) ⟳</div>
+        </div>
+        <div class="table-btns">
+          <button class="table-btn primary">存入销售线索</button>
+          <button class="table-btn">数据丰富</button>
+          <button class="table-btn">移除</button>
+          <button class="table-btn icon">⚙️</button>
+        </div>
+      </div>
+
+      <input class="search-input" placeholder="搜索" />
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th>
+            <th>公司名称</th>
+            <th>数据来源</th>
+            <th>官网地址</th>
+            <th>LinkedIn地址</th>
+            <th>联系电话</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>龙德医疗器械服务集团</td>
+            <td>APOLLO</td>
+            <td>--</td>
+            <td class="link">http://www.linkedin.com/company/...</td>
+            <td>--</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>深圳市开颜医疗器械有限公司</td>
+            <td>APOLLO</td>
+            <td>--</td>
+            <td class="link">http://www.linkedin.com/company/...</td>
+            <td>--</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>业聚医疗器械(深圳)有限公司</td>
+            <td>APOLLO</td>
+            <td>--</td>
+            <td class="link">http://www.linkedin.com/company/...</td>
+            <td>--</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>深圳市擎源医疗器械有限公司</td>
+            <td>APOLLO</td>
+            <td>--</td>
+            <td class="link">http://www.linkedin.com/company/...</td>
+            <td>--</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <div class="page-control">
+          <div class="page-btn">◀</div>
+          <div class="bar"></div>
+          <div class="page-btn">▶</div>
+        </div>
+        <div class="page-control">
+          <div class="page-btn">◀</div>
+          <div class="page-btn">▶</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

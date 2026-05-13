@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FXUI 原型参考 - 对象列表页</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                   "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #f0f1f3;
+      color: #191c23;
+      line-height: 1.5;
+    }
+    :root {
+      --fx-blue: #4880f7;
+      --fx-light-blue: #76baf9;
+      --fx-teal: #54b1a9;
+      --fx-green: #8bd9a5;
+      --fx-yellow-green: #9fcc65;
+      --fx-yellow: #f9d452;
+      --fx-orange: #f08833;
+      --fx-red: #eb5f3b;
+      --fx-purple: #ac75c0;
+      --fx-text: #191c23;
+      --fx-text-secondary: #4c4e54;
+      --fx-text-light: #909399;
+      --fx-border: #dcdfe6;
+      --fx-bg: #f0f1f3;
+      --fx-card: #fff;
+      --fx-sidebar-hover: #fef7e7;
+      --fx-divider: #eff0f2;
+      --fx-blue-btn: #4880f7;
+      --fx-table-header-bg: #fafafa;
+      --fx-table-border: #ebeef5;
+      --fx-table-hover: #f5f7fa;
+      --fx-table-stripe: #fafbfc;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ====== Top Nav ====== */
+    .top-nav {
+      height: 48px;
+      background: #f0f1f3;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      flex-shrink: 0;
+      gap: 24px;
+    }
+    .top-nav .logo {
+      width: 120px;
+      font-weight: 700;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .top-nav .logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--fx-blue), var(--fx-purple));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; font-weight: 700;
+    }
+    .top-nav .search-bar {
+      flex: 1;
+      max-width: 480px;
+      background: #fff;
+      border: 1px solid var(--fx-border);
+      border-radius: 4px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      color: var(--fx-text-light);
+      font-size: 13px;
+    }
+    .top-nav .search-bar::before { content: "🔍"; margin-right: 6px; font-size: 12px; }
+    .top-nav .nav-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .top-nav .nav-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #e8e9eb;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--fx-text-secondary);
+      cursor: default;
+      position: relative;
+    }
+    .top-nav .nav-icon .badge {
+      position: absolute;
+      top: -2px; right: -2px;
+      width: 6px; height: 6px;
+      background: var(--fx-red);
+      border-radius: 50%;
+    }
+    .top-nav .avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c084fc, var(--fx-purple));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; font-weight: 600;
+      cursor: default;
+    }
+
+    /* ====== Body ====== */
+    .body { display: flex; flex: 1; }
+
+    /* ====== Left Sidebar ====== */
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--fx-divider);
+      flex-shrink: 0;
+    }
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding: 8px 0; }
+    .sidebar .section-label {
+      font-size: 11px; color: var(--fx-text-light);
+      padding: 12px 16px 6px; font-weight: 500;
+    }
+    .sidebar .menu-item {
+      display: flex; align-items: center;
+      padding: 8px 16px; font-size: 13px; color: var(--fx-text);
+      cursor: default; gap: 8px;
+    }
+    .sidebar .menu-item:hover { background: var(--fx-sidebar-hover); }
+    .sidebar .menu-item .icon { width: 20px; text-align: center; font-size: 14px; color: var(--fx-text-secondary); }
+    .sidebar .menu-item .label { flex: 1; }
+    .sidebar .menu-item .count {
+      font-size: 11px; color: var(--fx-text-light);
+      background: #f0f1f3; padding: 1px 6px;
+      border-radius: 8px; min-width: 20px; text-align: center;
+    }
+    .sidebar .menu-item .count.red { background: var(--fx-red); color: #fff; }
+    .sidebar .divider { height: 1px; background: var(--fx-divider); margin: 8px 16px; }
+    .sidebar-bottom { border-top: 1px solid var(--fx-divider); padding: 8px 0; }
+    .sidebar .user-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-top: 1px solid var(--fx-divider);
+    }
+    .sidebar .user-card .u-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #4880f7, #ac75c0);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 13px; font-weight: 600;
+    }
+    .sidebar .user-card .u-name { font-size: 13px; font-weight: 500; }
+    .sidebar .user-card .u-role { font-size: 11px; color: var(--fx-text-light); }
+
+    /* ====== Content ====== */
+    .content {
+      flex: 1;
+      padding: 16px 20px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    /* ====== Page Header ====== */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .page-header .page-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fx-text);
+    }
+    .page-header .page-title .back {
+      font-size: 16px;
+      color: var(--fx-text-secondary);
+      margin-right: 8px;
+      cursor: default;
+    }
+    .page-header .page-title .sub {
+      font-size: 12px;
+      color: var(--fx-text-light);
+      font-weight: 400;
+      margin-left: 8px;
+    }
+    .page-header .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      height: 30px;
+      padding: 0 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      border: 1px solid var(--fx-border);
+      background: #fff;
+      color: var(--fx-text);
+      cursor: default;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-primary {
+      background: var(--fx-blue);
+      color: #fff;
+      border: none;
+    }
+    .btn-primary:hover { background: #3a6fd9; }
+    .btn .icon { font-size: 14px; }
+
+    /* ====== Filter Bar ====== */
+    .filter-bar {
+      background: #fff;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .filter-bar .filter-input {
+      height: 30px;
+      border: 1px solid var(--fx-border);
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 13px;
+      background: #fff;
+      min-width: 140px;
+      color: var(--fx-text-secondary);
+    }
+    .filter-bar .filter-date {
+      height: 30px;
+      border: 1px solid var(--fx-border);
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 13px;
+      background: #fff;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--fx-text-secondary);
+    }
+    .filter-bar .filter-btn {
+      height: 30px;
+      padding: 0 12px;
+      font-size: 13px;
+      color: var(--fx-blue);
+      cursor: default;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .filter-bar .filter-label {
+      font-size: 12px;
+      color: var(--fx-text-light);
+    }
+
+    /* ====== Table ====== */
+    .table-wrapper {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    thead th {
+      background: #fafafa;
+      border-bottom: 1px solid var(--fx-table-border);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 500;
+      color: var(--fx-text-secondary);
+      font-size: 12px;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    thead th .sort-icon {
+      color: var(--fx-text-light);
+      margin-left: 4px;
+      font-size: 10px;
+    }
+    tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--fx-table-border);
+      color: var(--fx-text);
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--fx-table-hover); }
+
+    /* Table cell types */
+    td .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+    td .tag.blue { background: #e8f4fd; color: #1a6ea8; }
+    td .tag.green { background: #e8f8e8; color: #389e0d; }
+    td .tag.orange { background: #fff3e0; color: #d46b08; }
+    td .tag.red { background: #ffebe6; color: #cf1322; }
+    td .tag.gray { background: #f0f0f0; color: #595959; }
+
+    td .link { color: var(--fx-blue); cursor: default; }
+
+    td .ops {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--fx-text-secondary);
+    }
+    td .ops span { cursor: default; }
+    td .ops span:hover { color: var(--fx-blue); }
+    td .ops .sep { color: var(--fx-table-border); }
+
+    td .avatar-sm {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--fx-blue);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 10px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    td .avatar-sm.purple { background: var(--fx-purple); }
+    td .avatar-sm.teal { background: var(--fx-teal); }
+    td .avatar-sm.orange { background: var(--fx-orange); }
+
+    /* ====== Pagination ====== */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 12px 16px;
+      gap: 6px;
+      border-top: 1px solid var(--fx-table-border);
+    }
+    .pagination .info {
+      font-size: 12px;
+      color: var(--fx-text-light);
+      margin-right: auto;
+    }
+    .pagination .page-btn {
+      width: 28px; height: 28px;
+      border-radius: 4px;
+      border: 1px solid var(--fx-border);
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      cursor: default;
+    }
+    .pagination .page-btn.active {
+      background: var(--fx-blue);
+      color: #fff;
+      border-color: var(--fx-blue);
+    }
+    .pagination .page-btn:hover:not(.active) { background: var(--fx-table-hover); }
+    .pagination .page-size {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--fx-text-light);
+      margin-left: 12px;
+    }
+
+    /* ====== Label ====== */
+    .page-tag {
+      position: fixed;
+      top: 8px; right: 8px;
+      background: var(--fx-blue);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      z-index: 100;
+      opacity: 0.8;
+    }
+    .page-label {
+      position: fixed;
+      bottom: 8px; right: 8px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-tag">参考图 2/2 — 对象列表页（经典列表）</div>
+  <div class="layout">
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="logo">
+        <div class="logo-icon">纷</div>
+        <span>纷享销客</span>
+      </div>
+      <div class="search-bar">搜索客户、商机、报表...</div>
+      <div class="nav-actions">
+        <div class="nav-icon">?</div>
+        <div class="nav-icon">🔔<span class="badge"></span></div>
+        <div class="avatar">江</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <!-- Left Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-scroll">
+          <div class="section-label">快捷导航</div>
+          <div class="menu-item">
+            <span class="icon">📊</span><span class="label">工作台</span>
+          </div>
+          <div class="menu-item" style="background:var(--fx-sidebar-hover)">
+            <span class="icon">👤</span><span class="label">客户</span><span class="count red">42</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">🎯</span><span class="label">线索</span><span class="count">18</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">💰</span><span class="label">商机</span><span class="count">6</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">📄</span><span class="label">合同</span>
+          </div>
+          <div class="divider"></div>
+          <div class="section-label">管理</div>
+          <div class="menu-item">
+            <span class="icon">📈</span><span class="label">报表</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">📋</span><span class="label">工单</span><span class="count">3</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">🏢</span><span class="label">渠道</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">🤖</span><span class="label">AI场景</span>
+          </div>
+        </div>
+        <div class="sidebar-bottom">
+          <div class="menu-item"><span class="icon">⚙️</span><span class="label">配置</span></div>
+          <div class="user-card">
+            <div class="u-avatar">江</div>
+            <div class="u-info">
+              <div class="u-name">江ch</div>
+              <div class="u-role">销售主管 · 纷享科技</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-title">
+            <span class="back">←</span> 客户列表
+            <span class="sub">共 42 条</span>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary"><span class="icon">+</span> 新建客户</button>
+            <button class="btn"><span class="icon">📥</span> 导入</button>
+            <button class="btn"><span class="icon">📤</span> 导出</button>
+            <button class="btn"><span class="icon">⚙️</span> 筛选列</button>
+            <button class="btn"><span class="icon">🔄</span> 刷新</button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <span class="filter-label">关键词：</span>
+          <span class="filter-input">客户名称、联系人、手机号</span>
+          <span class="filter-label">状态：</span>
+          <span class="filter-input">全部状态 ▼</span>
+          <span class="filter-label">负责人：</span>
+          <span class="filter-input">全部 ▼</span>
+          <span class="filter-label">创建时间：</span>
+          <span class="filter-date">📅 近30天 ▼</span>
+          <span class="filter-btn">高级筛选 ▾</span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" style="accent-color:var(--fx-blue)"></th>
+                <th style="width:160px">客户名称 <span class="sort-icon">⇅</span></th>
+                <th style="width:100px">状态 <span class="sort-icon">⇅</span></th>
+                <th style="width:120px">负责人 <span class="sort-icon">⇅</span></th>
+                <th style="width:100px">手机号</th>
+                <th style="width:120px">所属行业</th>
+                <th style="width:100px">客户来源</th>
+                <th style="width:110px">创建时间 <span class="sort-icon">⇅</span></th>
+                <th style="width:130px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">华科电子有限公司</span></td>
+                <td><span class="tag green">已签约</span></td>
+                <td><span class="avatar-sm">张</span>张伟</td>
+                <td>138****6789</td>
+                <td>企业服务</td>
+                <td>渠道推荐</td>
+                <td>2026-05-01</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">锐思科技集团</span></td>
+                <td><span class="tag blue">跟进中</span></td>
+                <td><span class="avatar-sm purple">李</span>李明</td>
+                <td>139****4567</td>
+                <td>信息技术</td>
+                <td>官网注册</td>
+                <td>2026-04-28</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">博联数据有限公司</span></td>
+                <td><span class="tag orange">方案中</span></td>
+                <td><span class="avatar-sm teal">王</span>王芳</td>
+                <td>186****2341</td>
+                <td>数据服务</td>
+                <td>市场活动</td>
+                <td>2026-04-25</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">天恒医疗器械</span></td>
+                <td><span class="tag blue">跟进中</span></td>
+                <td><span class="avatar-sm orange">赵</span>赵丽</td>
+                <td>135****8901</td>
+                <td>医疗健康</td>
+                <td>客户推荐</td>
+                <td>2026-04-22</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">云帆教育科技</span></td>
+                <td><span class="tag red">已流失</span></td>
+                <td><span class="avatar-sm">陈</span>陈晨</td>
+                <td>188****5678</td>
+                <td>教育培训</td>
+                <td>线上推广</td>
+                <td>2026-04-20</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">中科智能有限公司</span></td>
+                <td><span class="tag gray">意向客户</span></td>
+                <td><span class="avatar-sm purple">刘</span>刘强</td>
+                <td>158****3456</td>
+                <td>人工智能</td>
+                <td>展会</td>
+                <td>2026-04-18</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">星辰互联科技</span></td>
+                <td><span class="tag green">已签约</span></td>
+                <td><span class="avatar-sm">张</span>张伟</td>
+                <td>137****9012</td>
+                <td>互联网</td>
+                <td>渠道推荐</td>
+                <td>2026-04-15</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" style="accent-color:var(--fx-blue)"></td>
+                <td><span class="link">鼎盛集团</span></td>
+                <td><span class="tag blue">跟进中</span></td>
+                <td><span class="avatar-sm teal">王</span>王芳</td>
+                <td>136****7890</td>
+                <td>制造业</td>
+                <td>官网注册</td>
+                <td>2026-04-12</td>
+                <td class="ops"><span>查看</span><span class="sep">|</span><span>编辑</span><span class="sep">|</span><span>更多 ▾</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <span class="info">显示 1-8 条，共 42 条</span>
+            <span class="page-btn">‹</span>
+            <span class="page-btn active">1</span>
+            <span class="page-btn">2</span>
+            <span class="page-btn">3</span>
+            <span class="page-btn">4</span>
+            <span class="page-btn">5</span>
+            <span class="page-btn">⋯</span>
+            <span class="page-btn">›</span>
+            <span class="page-size">每页 <span style="color:var(--fx-text)">8</span> ▾</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-label">FXUI Prototype — 客户列表页 v1.0</div>
+</body>
+</html>

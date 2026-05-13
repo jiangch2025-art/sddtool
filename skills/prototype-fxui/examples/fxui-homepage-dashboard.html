@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FXUI 原型参考 - CRM首页三栏布局</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                   "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #f0f1f3;
+      color: #191c23;
+    }
+    :root {
+      --fx-blue: #4880f7;
+      --fx-light-blue: #76baf9;
+      --fx-teal: #54b1a9;
+      --fx-green: #8bd9a5;
+      --fx-yellow-green: #9fcc65;
+      --fx-yellow: #f9d452;
+      --fx-orange: #f08833;
+      --fx-red: #eb5f3b;
+      --fx-purple: #ac75c0;
+      --fx-text: #191c23;
+      --fx-text-secondary: #4c4e54;
+      --fx-text-light: #909399;
+      --fx-border: #dcdfe6;
+      --fx-bg: #f0f1f3;
+      --fx-card: #fff;
+      --fx-sidebar-hover: #fef7e7;
+      --fx-divider: #eff0f2;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ====== Top Nav ====== */
+    .top-nav {
+      height: 48px;
+      background: #f0f1f3;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      flex-shrink: 0;
+      gap: 24px;
+    }
+    .top-nav .logo {
+      width: 120px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--fx-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .top-nav .logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--fx-blue), var(--fx-purple));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; font-weight: 700;
+    }
+    .top-nav .search-bar {
+      flex: 1;
+      max-width: 480px;
+      background: #fff;
+      border: 1px solid var(--fx-border);
+      border-radius: 4px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      color: var(--fx-text-light);
+      font-size: 13px;
+    }
+    .top-nav .search-bar::before {
+      content: "🔍";
+      margin-right: 6px;
+      font-size: 12px;
+    }
+    .top-nav .nav-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .top-nav .nav-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #e8e9eb;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--fx-text-secondary);
+      cursor: default;
+      position: relative;
+    }
+    .top-nav .nav-icon .badge {
+      position: absolute;
+      top: -2px; right: -2px;
+      width: 6px; height: 6px;
+      background: var(--fx-red);
+      border-radius: 50%;
+    }
+    .top-nav .avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c084fc, var(--fx-purple));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; font-weight: 600;
+      cursor: default;
+    }
+
+    /* ====== Body: three columns ====== */
+    .body {
+      display: flex;
+      flex: 1;
+    }
+
+    /* ====== Left Sidebar ====== */
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--fx-divider);
+      flex-shrink: 0;
+    }
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .sidebar .section-label {
+      font-size: 11px;
+      color: var(--fx-text-light);
+      padding: 12px 16px 6px;
+      font-weight: 500;
+    }
+    .sidebar .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--fx-text);
+      cursor: default;
+      position: relative;
+      gap: 8px;
+    }
+    .sidebar .menu-item:hover { background: var(--fx-sidebar-hover); }
+    .sidebar .menu-item .icon {
+      width: 20px; text-align: center;
+      font-size: 14px;
+      color: var(--fx-text-secondary);
+    }
+    .sidebar .menu-item .label { flex: 1; }
+    .sidebar .menu-item .count {
+      font-size: 11px;
+      color: var(--fx-text-light);
+      background: #f0f1f3;
+      padding: 1px 6px;
+      border-radius: 8px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .sidebar .menu-item .count.red {
+      background: var(--fx-red);
+      color: #fff;
+    }
+    .sidebar .divider {
+      height: 1px;
+      background: var(--fx-divider);
+      margin: 8px 16px;
+    }
+
+    /* pinned bottom */
+    .sidebar-bottom {
+      border-top: 1px solid var(--fx-divider);
+      padding: 8px 0;
+    }
+    .sidebar-bottom .menu-item { color: var(--fx-text-secondary); }
+
+    .sidebar .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--fx-divider);
+    }
+    .sidebar .user-card .u-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4880f7, #ac75c0);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 13px; font-weight: 600;
+    }
+    .sidebar .user-card .u-info { flex: 1; }
+    .sidebar .user-card .u-name { font-size: 13px; font-weight: 500; }
+    .sidebar .user-card .u-role { font-size: 11px; color: var(--fx-text-light); }
+
+    /* ====== Main Content ====== */
+    .content {
+      flex: 1;
+      padding: 16px 20px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    /* KPI cards top row */
+    .kpi-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 4px;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .kpi-card.small {
+      width: 220px;
+      flex-shrink: 0;
+    }
+    .kpi-card.large {
+      flex: 1;
+    }
+    .kpi-card .kpi-title {
+      font-size: 13px;
+      color: var(--fx-text-secondary);
+      margin-bottom: 8px;
+    }
+    .kpi-card .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--fx-text);
+    }
+    .kpi-card .kpi-sub {
+      font-size: 12px;
+      color: var(--fx-text-light);
+      margin-top: 4px;
+    }
+    .kpi-card .mini-chart {
+      margin-top: 12px;
+      height: 40px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+    }
+    .kpi-card .mini-chart .bar {
+      flex: 1;
+      background: var(--fx-blue);
+      opacity: 0.3;
+      border-radius: 1px 1px 0 0;
+      height: 60%;
+    }
+    .kpi-card .mini-chart .bar:nth-child(2) { height: 80%; opacity: 0.5; }
+    .kpi-card .mini-chart .bar:nth-child(3) { height: 45%; opacity: 0.4; }
+    .kpi-card .mini-chart .bar:nth-child(4) { height: 90%; opacity: 0.6; }
+    .kpi-card .mini-chart .bar:nth-child(5) { height: 30%; opacity: 0.3; }
+    .kpi-card .mini-chart .bar:nth-child(6) { height: 70%; opacity: 0.5; }
+
+    .progress-list { margin-top: 12px; }
+    .progress-item { margin-bottom: 10px; }
+    .progress-item .p-label {
+      font-size: 12px; color: var(--fx-text-secondary);
+      margin-bottom: 4px;
+      display: flex; justify-content: space-between;
+    }
+    .progress-item .p-track {
+      height: 6px;
+      background: #eef0f4;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-item .p-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--fx-blue);
+    }
+    .progress-item .p-fill.green { background: var(--fx-green); }
+    .progress-item .p-fill.teal { background: var(--fx-teal); }
+
+    /* Funnel chart */
+    .funnel-chart {
+      background: #fff;
+      border-radius: 4px;
+      padding: 20px 24px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .funnel-chart .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .funnel-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+    .funnel-row .f-label {
+      width: 80px;
+      font-size: 12px;
+      color: var(--fx-text-secondary);
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .funnel-row .f-bar {
+      height: 22px;
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .funnel-colors { display: flex; height: 22px; border-radius: 2px; overflow: hidden; flex: 1; }
+    .funnel-seg { height: 100%; }
+    .funnel-row .f-val {
+      width: 50px;
+      font-size: 11px;
+      color: var(--fx-text-light);
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ====== Right Panel ====== */
+    .right-panel {
+      width: 300px;
+      background: #fff;
+      border-left: 1px solid var(--fx-divider);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .right-panel .panel-header {
+      padding: 16px 16px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--fx-divider);
+    }
+    .right-panel .feed-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .feed-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .feed-item .f-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .feed-item .f-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--fx-blue);
+      flex-shrink: 0;
+    }
+    .feed-item .f-title {
+      font-size: 13px;
+      font-weight: 500;
+      flex: 1;
+    }
+    .feed-item .f-time {
+      font-size: 11px;
+      color: var(--fx-text-light);
+    }
+    .feed-item .f-body {
+      font-size: 12px;
+      color: var(--fx-text-secondary);
+      line-height: 1.5;
+      margin-left: 14px;
+    }
+    .feed-item .f-actions {
+      display: flex;
+      gap: 12px;
+      margin-left: 14px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--fx-text-light);
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--fx-text-secondary);
+    }
+    .legend-item .swatch {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+    }
+
+    /* ====== Label ====== */
+    .page-label {
+      position: fixed;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      z-index: 100;
+    }
+    .page-tag {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      background: var(--fx-blue);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      z-index: 100;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-tag">参考图 1/2 — CRM 首页三栏布局</div>
+  <div class="page">
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="logo">
+        <div class="logo-icon">纷</div>
+        <span>纷享销客</span>
+      </div>
+      <div class="search-bar">搜索客户、商机、报表...</div>
+      <div class="nav-actions">
+        <div class="nav-icon">?</div>
+        <div class="nav-icon">
+          🔔
+          <span class="badge"></span>
+        </div>
+        <div class="avatar">江</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <!-- Left Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-scroll">
+          <div class="section-label">快捷导航</div>
+          <div class="menu-item">
+            <span class="icon">📊</span>
+            <span class="label">工作台</span>
+          </div>
+          <div class="menu-item" style="background:var(--fx-sidebar-hover)">
+            <span class="icon">👤</span>
+            <span class="label">客户</span>
+            <span class="count red">42</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">🎯</span>
+            <span class="label">线索</span>
+            <span class="count">18</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">💰</span>
+            <span class="label">商机</span>
+            <span class="count">6</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">📄</span>
+            <span class="label">合同</span>
+          </div>
+          <div class="divider"></div>
+          <div class="section-label">管理</div>
+          <div class="menu-item">
+            <span class="icon">📈</span>
+            <span class="label">报表</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">📋</span>
+            <span class="label">工单</span>
+            <span class="count">3</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">🏢</span>
+            <span class="label">渠道</span>
+          </div>
+          <div class="menu-item">
+            <span class="icon">🤖</span>
+            <span class="label">AI场景</span>
+          </div>
+        </div>
+
+        <div class="sidebar-bottom">
+          <div class="menu-item">
+            <span class="icon">⚙️</span>
+            <span class="label">配置</span>
+          </div>
+          <div class="user-card">
+            <div class="u-avatar">江</div>
+            <div class="u-info">
+              <div class="u-name">江ch</div>
+              <div class="u-role">销售主管 · 纷享科技</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- KPI Row -->
+        <div class="kpi-row">
+          <div class="kpi-card small">
+            <div class="kpi-title">今日新增客户</div>
+            <div class="kpi-value">42</div>
+            <div class="kpi-sub">较昨日 ↑12.3%</div>
+            <div class="mini-chart">
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+          </div>
+          <div class="kpi-card large">
+            <div class="kpi-title">本月目标达成</div>
+            <div style="display:flex;gap:24px;margin-top:4px;">
+              <div>
+                <div class="kpi-value" style="font-size:20px;">¥ 128.6万</div>
+                <div class="kpi-sub">目标 ¥ 200万</div>
+              </div>
+              <div style="border-left:1px solid var(--fx-divider);padding-left:24px;">
+                <div class="kpi-value" style="font-size:20px;">64.3%</div>
+                <div class="kpi-sub">完成率</div>
+              </div>
+            </div>
+            <div class="progress-list">
+              <div class="progress-item">
+                <div class="p-label"><span>签约金额</span><span>¥ 98.5万</span></div>
+                <div class="p-track"><div class="p-fill" style="width:49%"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="p-label"><span>回款金额</span><span>¥ 72.3万</span></div>
+                <div class="p-track"><div class="p-fill green" style="width:36%"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="p-label"><span>新增商机</span><span>18 个</span></div>
+                <div class="p-track"><div class="p-fill teal" style="width:60%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Funnel Chart -->
+        <div class="funnel-chart">
+          <div class="chart-title">销售管道分布</div>
+          <div class="legend">
+            <span class="legend-item"><span class="swatch" style="background:var(--fx-blue)"></span>线索</span>
+            <span class="legend-item"><span class="swatch" style="background:var(--fx-teal)"></span>意向</span>
+            <span class="legend-item"><span class="swatch" style="background:var(--fx-green)"></span>方案</span>
+            <span class="legend-item"><span class="swatch" style="background:var(--fx-yellow-green)"></span>报价</span>
+            <span class="legend-item"><span class="swatch" style="background:var(--fx-yellow)"></span>谈判</span>
+            <span class="legend-item"><span class="swatch" style="background:var(--fx-orange)"></span>签约</span>
+          </div>
+
+          <div class="funnel-row">
+            <span class="f-label">产品A</span>
+            <div class="funnel-colors">
+              <div class="funnel-seg" style="flex:40;background:var(--fx-blue)"></div>
+              <div class="funnel-seg" style="flex:25;background:var(--fx-teal)"></div>
+              <div class="funnel-seg" style="flex:15;background:var(--fx-green)"></div>
+              <div class="funnel-seg" style="flex:10;background:var(--fx-yellow-green)"></div>
+              <div class="funnel-seg" style="flex:6;background:var(--fx-yellow)"></div>
+              <div class="funnel-seg" style="flex:4;background:var(--fx-orange)"></div>
+            </div>
+            <span class="f-val">185</span>
+          </div>
+          <div class="funnel-row">
+            <span class="f-label">产品B</span>
+            <div class="funnel-colors">
+              <div class="funnel-seg" style="flex:35;background:var(--fx-blue)"></div>
+              <div class="funnel-seg" style="flex:22;background:var(--fx-teal)"></div>
+              <div class="funnel-seg" style="flex:18;background:var(--fx-green)"></div>
+              <div class="funnel-seg" style="flex:12;background:var(--fx-yellow-green)"></div>
+              <div class="funnel-seg" style="flex:8;background:var(--fx-yellow)"></div>
+              <div class="funnel-seg" style="flex:5;background:var(--fx-orange)"></div>
+            </div>
+            <span class="f-val">142</span>
+          </div>
+          <div class="funnel-row">
+            <span class="f-label">产品C</span>
+            <div class="funnel-colors">
+              <div class="funnel-seg" style="flex:30;background:var(--fx-blue)"></div>
+              <div class="funnel-seg" style="flex:20;background:var(--fx-teal)"></div>
+              <div class="funnel-seg" style="flex:20;background:var(--fx-green)"></div>
+              <div class="funnel-seg" style="flex:15;background:var(--fx-yellow-green)"></div>
+              <div class="funnel-seg" style="flex:10;background:var(--fx-yellow)"></div>
+              <div class="funnel-seg" style="flex:5;background:var(--fx-orange)"></div>
+            </div>
+            <span class="f-val">98</span>
+          </div>
+          <div class="funnel-row">
+            <span class="f-label">产品D</span>
+            <div class="funnel-colors">
+              <div class="funnel-seg" style="flex:38;background:var(--fx-blue)"></div>
+              <div class="funnel-seg" style="flex:28;background:var(--fx-teal)"></div>
+              <div class="funnel-seg" style="flex:18;background:var(--fx-green)"></div>
+              <div class="funnel-seg" style="flex:8;background:var(--fx-yellow-green)"></div>
+              <div class="funnel-seg" style="flex:5;background:var(--fx-yellow)"></div>
+              <div class="funnel-seg" style="flex:3;background:var(--fx-orange)"></div>
+            </div>
+            <span class="f-val">76</span>
+          </div>
+          <div class="funnel-row">
+            <span class="f-label">产品E</span>
+            <div class="funnel-colors">
+              <div class="funnel-seg" style="flex:25;background:var(--fx-blue)"></div>
+              <div class="funnel-seg" style="flex:25;background:var(--fx-teal)"></div>
+              <div class="funnel-seg" style="flex:20;background:var(--fx-green)"></div>
+              <div class="funnel-seg" style="flex:15;background:var(--fx-yellow-green)"></div>
+              <div class="funnel-seg" style="flex:10;background:var(--fx-yellow)"></div>
+              <div class="funnel-seg" style="flex:5;background:var(--fx-orange)"></div>
+            </div>
+            <span class="f-val">54</span>
+          </div>
+          <div class="funnel-row">
+            <span class="f-label">产品F</span>
+            <div class="funnel-colors">
+              <div class="funnel-seg" style="flex:20;background:var(--fx-blue)"></div>
+              <div class="funnel-seg" style="flex:20;background:var(--fx-teal)"></div>
+              <div class="funnel-seg" style="flex:20;background:var(--fx-green)"></div>
+              <div class="funnel-seg" style="flex:18;background:var(--fx-yellow-green)"></div>
+              <div class="funnel-seg" style="flex:12;background:var(--fx-yellow)"></div>
+              <div class="funnel-seg" style="flex:10;background:var(--fx-orange)"></div>
+            </div>
+            <span class="f-val">32</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="right-panel">
+        <div class="panel-header">动态</div>
+        <div class="feed-list">
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot"></span>
+              <span class="f-title">李明 新建了合同</span>
+              <span class="f-time">2分钟前</span>
+            </div>
+            <div class="f-body">合同编号：HT-2026-00128，金额：¥28.5万</div>
+            <div class="f-actions"><span>👍 3</span><span>💬 1</span></div>
+          </div>
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot" style="background:var(--fx-green)"></span>
+              <span class="f-title">王芳 跟进客户</span>
+              <span class="f-time">15分钟前</span>
+            </div>
+            <div class="f-body">客户"华科电子" — 方案演示已完成，客户对报价有兴趣</div>
+            <div class="f-actions"><span>👍 5</span><span>💬 2</span></div>
+          </div>
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot" style="background:var(--fx-orange)"></span>
+              <span class="f-title">张伟 更新了商机阶段</span>
+              <span class="f-time">1小时前</span>
+            </div>
+            <div class="f-body">商机"智慧园区项目"从「方案」推进至「报价」阶段</div>
+            <div class="f-actions"><span>👍 2</span></div>
+          </div>
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot"></span>
+              <span class="f-title">系统 提醒</span>
+              <span class="f-time">2小时前</span>
+            </div>
+            <div class="f-body">有 3 条线索超过48小时未跟进，请及时处理</div>
+          </div>
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot" style="background:var(--fx-yellow)"></span>
+              <span class="f-title">赵丽 提交了周报</span>
+              <span class="f-time">3小时前</span>
+            </div>
+            <div class="f-body">本周完成拜访12家，新增线索8条，商机推进3个</div>
+            <div class="f-actions"><span>👍 8</span></div>
+          </div>
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot" style="background:var(--fx-red)"></span>
+              <span class="f-title">审批提醒</span>
+              <span class="f-time">4小时前</span>
+            </div>
+            <div class="f-body">刘强 提交了合同审批「HT-2026-00125」待你审批</div>
+          </div>
+          <div class="feed-item">
+            <div class="f-header">
+              <span class="f-dot" style="background:var(--fx-teal)"></span>
+              <span class="f-title">陈晨 创建了客户</span>
+              <span class="f-time">昨天</span>
+            </div>
+            <div class="f-body">新客户「锐思科技」已创建，行业：企业服务</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-label">FXUI Prototype — 首页三栏布局 v1.0</div>
+</body>
+</html>
