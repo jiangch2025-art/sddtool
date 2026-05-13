@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - Agents</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* ========== 顶部导航 ========== */
+        .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid #e5e7eb;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            cursor: pointer;
+            color: #666;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon {
+            font-size: 18px;
+            color: #555;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            background-color: #ff4d4f;
+            color: white;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 10px;
+        }
+
+        .user-tag {
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* ========== 主体布局 ========== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            margin-top: 56px;
+            overflow: hidden;
+        }
+
+        /* ========== 左侧菜单 ========== */
+        .sidebar-left {
+            width: 200px;
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-search {
+            width: 100%;
+            height: 36px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 0 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 8px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+
+        .menu-item.active {
+            background-color: #fff7e6;
+            color: #ff7d00;
+            font-weight: 500;
+        }
+
+        .menu-group-title {
+            font-size: 12px;
+            color: #999;
+            margin: 16px 0 8px;
+        }
+
+        .collapse-btn {
+            text-align: center;
+            padding: 10px;
+            color: #888;
+            cursor: pointer;
+            margin-top: auto;
+        }
+
+        /* ========== 主内容区 ========== */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-new {
+            padding: 8px 16px;
+            background-color: #ff7d00;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .filter-dropdown {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            padding: 6px 12px;
+            font-size: 14px;
+            width: 200px;
+        }
+
+        .search-icon {
+            padding: 0 12px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        /* 表格 */
+        .agent-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .agent-table th {
+            background-color: #f9fafb;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .agent-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .agent-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .action-link {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 12px 0;
+            font-size: 14px;
+            color: #666;
+            gap: 12px;
+        }
+
+        .pagination-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-header">
+    <div class="header-left">
+        <div class="back-btn">◀ 返回</div>
+        <div class="header-title">管理后台</div>
+    </div>
+    <div class="header-right">
+        <div class="header-icon">💬<span class="badge">37</span></div>
+        <div class="header-icon">🔔</div>
+        <div class="header-icon">📋</div>
+        <div class="header-icon">❓</div>
+        <div class="user-tag">
+            <div>品牌商</div>
+            <div>厂家</div>
+        </div>
+    </div>
+</div>
+
+<!-- 主体布局 -->
+<div class="main-container">
+    <!-- 左侧菜单 -->
+    <div class="sidebar-left">
+        <input type="text" class="sidebar-search" placeholder="🔍 搜索">
+
+        <div class="menu-section">
+            <div class="menu-item">🏠 站点管理 <span style="margin-left: auto;">></span></div>
+            <div class="menu-item">🏪 渠道门户 <span style="margin-left: auto;">></span></div>
+            <div class="menu-item">🌐 互联管理 <span style="margin-left: auto;">></span></div>
+            <div class="menu-item">💬 微信服务号</div>
+            <div class="menu-item">📱 微信小程序</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-group-title">企微SCRM</div>
+            <div class="menu-item">⚙️ 服务通设置</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-group-title">AI平台管理</div>
+            <div class="menu-item" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>🤖 Agent Studio</span>
+                <span>▼</span>
+            </div>
+            <div class="menu-item active">Agents</div>
+            <div class="menu-item">Agent 技能库</div>
+            <div class="menu-item">Agent 操作库</div>
+            <div class="menu-item">⚙️ 操作中心</div>
+            <div class="menu-item">📝 提示词模板</div>
+            <div class="menu-item">🔍 语义检索索引</div>
+            <div class="menu-item">📊 调用统计</div>
+        </div>
+
+        <div class="collapse-btn">⟨</div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="page-header">
+            <div class="page-title">Agents <span style="font-size:12px; color:#999;">❔</span></div>
+            <button class="btn-new">新建</button>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-item">
+                <span class="filter-label">类型</span>
+                <span style="color:#666;">全部 ▼</span>
+            </div>
+            <div class="filter-item">
+                <span class="filter-label">来源:</span>
+                <select class="filter-dropdown">
+                    <option>全部</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <table class="agent-table">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>API Name</th>
+                    <th>类型</th>
+                    <th>描述</th>
+                    <th>创建人</th>
+                    <th>创建时间</th>
+                    <th>最后修改人</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>订货通POC Agent</td>
+                    <td>ordering_link_poc_...</td>
+                    <td>AI助理</td>
+                    <td>改agent就是用来做...</td>
+                    <td>江长会George</td>
+                    <td>2026-05-09 14:50</td>
+                    <td>江长会George</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>渠道经营Agent</td>
+                    <td>channel_operation_...</td>
+                    <td>AI助理</td>
+                    <td>渠道经营Agent，包...</td>
+                    <td>江长会George</td>
+                    <td>2026-05-08 17:40</td>
+                    <td>江长会George</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>ShareClaw</td>
+                    <td>ShareClaw</td>
+                    <td>AI助理</td>
+                    <td>纷享 ShareClaw Ag...</td>
+                    <td>系统</td>
+                    <td>2026-05-08 15:55</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>销售定价 Agent</td>
+                    <td>sales_pricing_agen...</td>
+                    <td>AI助理</td>
+                    <td>你是企业的销售助...</td>
+                    <td>江长会George</td>
+                    <td>2026-05-06 15:53</td>
+                    <td>江长会George</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>成本核算 Agent</td>
+                    <td>lzd078q1km_c</td>
+                    <td>AI助理</td>
+                    <td>成本核算 Agent</td>
+                    <td>江长会George</td>
+                    <td>2026-05-06 15:51</td>
+                    <td>江长会George</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>智能盈利Agent</td>
+                    <td>p01nzsmq9_c</td>
+                    <td>AI助理</td>
+                    <td>智能盈利Agent</td>
+                    <td>江长会George</td>
+                    <td>2026-05-06 15:47</td>
+                    <td>江长会George</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>工程解读 Agent</td>
+                    <td>avn339llfk_c</td>
+                    <td>AI助理</td>
+                    <td>工程解读 Agent</td>
+                    <td>江长会George</td>
+                    <td>2026-05-06 15:45</td>
+                    <td>江长会George</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>Skill创建助手</td>
+                    <td>skill-creation-assistant</td>
+                    <td>AI助理</td>
+                    <td>帮助用户在管理后...</td>
+                    <td>系统</td>
+                    <td>2026-04-23 20:40</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>销售助理</td>
+                    <td>sales_assistant_c</td>
+                    <td>AI助理</td>
+                    <td>你是企业的销售助...</td>
+                    <td>卢义</td>
+                    <td>2026-05-07 14:08</td>
+                    <td>卢义</td>
+                    <td><span class="action-link">编辑</span><span class="action-link">停用</span></td>
+                </tr>
+                <tr>
+                    <td>销售助理</td>
+                    <td>Copilot_Sales_Assi...</td>
+                    <td>AI助理</td>
+                    <td>你是企业的销售助...</td>
+                    <td>系统</td>
+                    <td>2025-07-13 22:28</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>SDR WhatsApp侧...</td>
+                    <td>SDR_sidebar_assis...</td>
+                    <td>AI助理</td>
+                    <td>你是协助SDR人员...</td>
+                    <td>系统</td>
+                    <td>2025-11-21 16:09</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>智能数据分析助手</td>
+                    <td>Copilot_New_BI</td>
+                    <td>AI助理</td>
+                    <td>1. **敏捷数据获取 (...</td>
+                    <td>系统</td>
+                    <td>2025-04-18 16:12</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>知识库Agent</td>
+                    <td>Copilot_knowledge</td>
+                    <td>AI助理</td>
+                    <td>员工与伙伴的知识...</td>
+                    <td>系统</td>
+                    <td>2024-11-18 23:51</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>工单执行助手</td>
+                    <td>Agent_WorkOrder_...</td>
+                    <td>AI助理</td>
+                    <td>工单执行助手是售...</td>
+                    <td>系统</td>
+                    <td>2026-02-10 20:08</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+                <tr>
+                    <td>门户知识库Agent</td>
+                    <td>Copilot_portal_kno...</td>
+                    <td>AI助理</td>
+                    <td>智能知识库 AI 助手...</td>
+                    <td>系统</td>
+                    <td>2026-02-06 20:10</td>
+                    <td>系统</td>
+                    <td><span class="action-link">编辑</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span>共 34 条</span>
+            <span>1/1</span>
+            <button class="pagination-btn">&lt;</button>
+            <button class="pagination-btn">&gt;</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

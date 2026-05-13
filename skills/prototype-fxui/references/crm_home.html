@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订货管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* ========== 顶部导航栏 ========== */
+        .header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid #e5e7eb;
+            z-index: 100;
+        }
+
+        .header-left {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-search-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: #f5f7fa;
+            border-radius: 16px;
+            padding: 4px 12px;
+        }
+
+        .header-dropdown {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .header-search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: #666;
+            width: 100px;
+        }
+
+        .header-icon {
+            font-size: 18px;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-icon.ai {
+            background: linear-gradient(135deg, #6e56cf, #ff4d4f);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .header-user-tag {
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* ========== 主体三栏布局 ========== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            margin-top: 56px;
+            overflow: hidden;
+        }
+
+        /* ========== 最左侧一级导航 ========== */
+        .sidebar-first {
+            width: 70px;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+            cursor: pointer;
+            position: relative;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .nav-item .icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item .badge {
+            position: absolute;
+            top: -4px;
+            right: 12px;
+            background-color: #ff6f3a;
+            color: white;
+            border-radius: 10px;
+            padding: 1px 5px;
+            font-size: 11px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            background-color: white;
+            border-radius: 8px 0 0 8px;
+            color: #ff9500;
+        }
+
+        .nav-item.active .icon {
+            color: #ff9500;
+        }
+
+        .nav-bottom {
+            margin-top: auto;
+        }
+
+        /* ========== 第二列二级菜单 ========== */
+        .sidebar-second {
+            width: 220px;
+            background-color: white;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #111;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            flex: 1;
+            height: 36px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 0 10px;
+            font-size: 14px;
+            background-color: #fafafa;
+        }
+
+        .add-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .menu-list {
+            list-style: none;
+            flex: 1;
+        }
+
+        .menu-item {
+            padding: 10px 8px;
+            font-size: 15px;
+            color: #222;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-item.active {
+            background-color: #fff7e6;
+            font-weight: 500;
+        }
+
+        .menu-group {
+            padding: 10px 8px;
+            font-size: 15px;
+            color: #222;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .menu-group::before {
+            content: "▼";
+            font-size: 12px;
+            color: #888;
+        }
+
+        .sub-item {
+            padding: 8px 8px 8px 20px;
+            font-size: 14px;
+            color: #222;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-item.collapsed::before {
+            content: "▶";
+            font-size: 10px;
+            color: #888;
+            margin-right: 4px;
+        }
+
+        .collapse-btn {
+            text-align: right;
+            padding: 10px 8px;
+            font-size: 16px;
+            color: #888;
+            cursor: pointer;
+            margin-top: auto;
+        }
+
+        /* ========== 主内容区 ========== */
+        .main-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .tab-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 12px;
+        }
+
+        .tab-item {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .tab-item.active {
+            color: #ff7d00;
+            font-weight: 500;
+            border-bottom: 2px solid #ff7d00;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .header-left-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .filter-btn {
+            padding: 6px 16px;
+            border: 1px solid #ff7d00;
+            background: white;
+            color: #ff7d00;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .search-input-small {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            width: 200px;
+        }
+
+        .header-right-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-new {
+            padding: 6px 16px;
+            background-color: #ff7d00;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .table-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 表格 */
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .order-table th {
+            background-color: #f9fafb;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .order-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .order-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .status-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: #fff7e6;
+            color: #ff7d00;
+        }
+
+        .status-tag.partial {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .status-tag.completed {
+            background-color: #f0f9eb;
+            color: #52c41a;
+        }
+
+        .action-link {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 12px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .pagination-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            margin: 0 4px;
+        }
+
+        .ai-assistant-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            color: #6e56cf;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航栏 -->
+<div class="header-bar">
+    <div class="header-left">(fktest2724)深圳纷享智能制造有限公司-dht</div>
+    <div class="header-right">
+        <div class="header-search-wrapper">
+            <div class="header-dropdown">全部 ▼</div>
+            <input type="text" class="header-search-input" placeholder="搜索">
+        </div>
+        <div class="header-icon">🔍</div>
+        <div class="header-icon">🕒</div>
+        <div class="header-icon">🗎</div>
+        <div class="header-icon">👥</div>
+        <div class="header-icon">❓</div>
+        <div class="header-icon">🛍️</div>
+        <div class="header-icon ai">✨</div>
+        <div class="header-icon">⋮</div>
+        <div class="header-user-tag">
+            <div>品牌商</div>
+            <div>厂家</div>
+        </div>
+    </div>
+</div>
+
+<!-- 主体三栏布局 -->
+<div class="main-container">
+    <!-- 最左侧一级导航 -->
+    <div class="sidebar-first">
+        <div class="nav-item">
+            <div class="icon">💬</div>
+            <span>企信</span>
+            <div class="badge">37</div>
+        </div>
+        <div class="nav-item active">
+            <div class="icon">📦</div>
+            <span>订货管理</span>
+            <div class="badge">15</div>
+        </div>
+        <div class="nav-item">
+            <div class="icon">🕒</div>
+            <span>CRM</span>
+            <div class="badge">15</div>
+        </div>
+        <div class="nav-item">
+            <div class="icon">✅</div>
+            <span>待办</span>
+            <div class="badge">25</div>
+        </div>
+        <div class="nav-item">
+            <div class="icon">👑</div>
+            <span>智能盈...</span>
+        </div>
+        <div class="nav-item">
+            <div class="icon">品</div>
+            <span>更多</span>
+        </div>
+
+        <div class="nav-bottom">
+            <div class="nav-item">
+                <div class="icon">⚙️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二列二级菜单 -->
+    <div class="sidebar-second">
+        <div class="app-title">订货管理</div>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="搜索">
+            <button class="add-btn">+</button>
+        </div>
+
+        <ul class="menu-list">
+            <li class="menu-item">
+                <span>🏠</span> 首页
+            </li>
+            <li class="menu-item">
+                <span>🔔</span> CRM提醒
+                <span style="color: #ff7d00; font-size: 12px;">15</span>
+            </li>
+            <li class="menu-item">
+                <span>✅</span> CRM待办
+                <span style="color: #ff7d00; font-size: 12px;">25</span>
+            </li>
+            <li class="sub-item collapsed">客户管理</li>
+            <li class="sub-item collapsed">产品管理</li>
+            <li class="sub-item collapsed">价格管理</li>
+            <li class="menu-group">订单管理</li>
+            <li class="menu-item active">
+                <span>📄</span> 销售订单
+            </li>
+            <li class="menu-item">
+                <span>📦</span> 订单产品
+            </li>
+            <li class="menu-item">
+                <span>🚚</span> 发货单
+            </li>
+            <li class="menu-item">
+                <span>📦</span> 发货单产品
+            </li>
+            <li class="sub-item collapsed">报表分析</li>
+            <li class="sub-item collapsed">回款管理</li>
+            <li class="sub-item collapsed">分销管理</li>
+            <li class="sub-item collapsed">商城配置</li>
+            <li class="sub-item collapsed">客户账户</li>
+            <li class="menu-item">
+                <span>🖥️</span> 代客下单
+            </li>
+        </ul>
+
+        <div class="collapse-btn">⟨</div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="tab-header">
+            <div class="tab-item active">订单列表</div>
+            <div class="tab-item">选特价下单</div>
+            <div class="tab-item">待发货产品</div>
+            <div class="tab-item">图表</div>
+        </div>
+
+        <div class="content-header">
+            <div class="header-left-section">
+                <div style="font-size: 16px; font-weight: 500;">销售订单 | <span style="font-weight: normal; color: #666;">全部 ▼</span></div>
+            </div>
+            <div class="header-right-section">
+                <button class="btn-new">新建</button>
+                <button class="control-btn">⋯</button>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <select class="dropdown">
+                <option>全部业务类型</option>
+            </select>
+            <button class="filter-btn">筛选</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 14px; color: #666;">销售订单编号 ▼</span>
+                <input type="text" class="search-input-small" placeholder="搜索">
+            </div>
+            <div class="table-controls" style="margin-left: auto;">
+                <button class="control-btn">☰</button>
+                <button class="control-btn">🗖</button>
+                <button class="control-btn">⚙</button>
+                <button class="control-btn">⟳</button>
+            </div>
+        </div>
+
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox"></th>
+                    <th></th>
+                    <th>销售订单编号</th>
+                    <th>🔒 来源</th>
+                    <th>发货状态</th>
+                    <th>下单日期</th>
+                    <th>客户名称</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20251124-000111</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2025-11-24</td>
+                    <td><a href="#" style="color: #1890ff;">深圳市方舟电子设备销售有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20251124-000110</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2025-11-24</td>
+                    <td><a href="#" style="color: #1890ff;">深圳市方舟电子设备销售有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20251118-000109</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2025-11-18</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20250612-000108</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2025-06-12</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241212-000107</td>
+                    <td>订货通</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-12-12</td>
+                    <td><a href="#" style="color: #1890ff;">深圳市方舟电子设备销售有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241210-000106</td>
+                    <td>订货通</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-12-10</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241108-000103</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag partial">部分收货</span></td>
+                    <td>2024-11-08</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">确认收货</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241108-000105</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag completed">已收货</span></td>
+                    <td>2024-11-08</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241030-000099</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-10-30</td>
+                    <td><a href="#" style="color: #1890ff;">力丰机械贸易（中国）有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241030-000100</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-10-30</td>
+                    <td><a href="#" style="color: #1890ff;">力丰机械贸易（中国）有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241108-000104</td>
+                    <td>CRM</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-11-08</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">立即付款</span>
+                        <span class="action-link">余额扣减</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241108-000102</td>
+                    <td>订货通</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-11-08</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">余额扣减</span>
+                        <span class="action-link">下托委...</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241031-000101</td>
+                    <td>订货通</td>
+                    <td><span class="status-tag completed">已收货</span></td>
+                    <td>2024-10-31</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">余额扣减</span>
+                        <span class="action-link">下托委...</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>📄</td>
+                    <td>20241030-000098</td>
+                    <td>订货通</td>
+                    <td><span class="status-tag">待发货</span></td>
+                    <td>2024-10-30</td>
+                    <td><a href="#" style="color: #1890ff;">武汉天马微电子有限公司</a></td>
+                    <td>
+                        <span class="action-link">再次下单</span>
+                        <span class="action-link">余额扣减</span>
+                        <span class="action-link">下托委...</span>
+                        <span>▼</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span>共 105 条</span>
+            <span style="margin: 0 8px;">1/2</span>
+            <button class="pagination-btn">&lt;</button>
+            <button class="pagination-btn">&gt;</button>
+        </div>
+    </div>
+</div>
+
+<button class="ai-assistant-btn">🤖</button>
+
+</body>
+</html>

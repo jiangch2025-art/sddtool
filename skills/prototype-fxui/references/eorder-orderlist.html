@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订货通 - 销售订单列表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
+        .top-nav-bg { background-color: #f0f5fa; }
+        .sidebar-active { background-color: #fff7ed; color: #f97316; border-right: 4px solid #f97316; }
+        .table-header { background-color: #fafafa; }
+        .btn-orange { background-color: #f97316; color: white; }
+        .text-link { color: #3296fa; cursor: pointer; }
+        .text-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden flex-col">
+
+    <!-- 1. 顶部导航层 (Top Header) -->
+    <header class="h-10 top-nav-bg flex items-center justify-between px-4 shrink-0 border-b border-blue-100">
+        <div class="text-xs text-gray-600">
+            <span>内测企业fktest4989-多级订货</span>
+        </div>
+        <div class="flex items-center space-x-4 text-gray-500">
+            <i class="far fa-question-circle text-sm"></i>
+            <div class="w-7 h-7 bg-gray-300 rounded-full flex items-center justify-center text-white">
+                <i class="fas fa-user text-xs"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 2. 左侧一级窄边栏 -->
+        <div class="w-14 bg-[#3296fa] flex flex-col items-center py-4 space-y-4 shrink-0">
+            <div class="w-10 h-10 bg-white/20 rounded flex items-center justify-center text-white text-[10px] text-center leading-tight">渠道<br>分销</div>
+            <div class="w-12 h-12 bg-white rounded flex flex-col items-center justify-center text-[#f97316] text-[10px] shadow-sm">
+                <i class="fas fa-shopping-cart text-lg mb-0.5"></i>
+                <span>订货通</span>
+            </div>
+        </div>
+
+        <!-- 3. 左侧二级菜单 -->
+        <div class="w-52 bg-white border-r flex flex-col shrink-0">
+            <div class="p-4">
+                <h1 class="font-bold text-gray-800 text-base mb-4">订货通</h1>
+                <div class="relative group">
+                    <input type="text" placeholder="搜索" class="w-full bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm">
+                    <i class="fas fa-plus absolute right-2 top-2 text-gray-400 text-xs"></i>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto text-sm text-gray-600">
+                <div class="px-4 py-2.5 flex items-center space-x-3 hover:bg-gray-50"><i class="fas fa-home w-4"></i> <span>首页</span></div>
+                <div class="px-4 py-2.5 flex items-center justify-between hover:bg-gray-50">
+                    <div class="flex items-center space-x-3"><i class="fas fa-clock w-4"></i> <span>待办事项</span></div>
+                    <span class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full scale-90">1</span>
+                </div>
+                <div class="px-4 py-2.5 flex items-center space-x-3 hover:bg-gray-50"><i class="fas fa-bullhorn w-4"></i> <span>业务通知</span></div>
+                <div class="mt-2">
+                    <div class="px-4 py-2 text-[11px] text-gray-400 flex items-center justify-between uppercase">在线订货 <i class="fas fa-chevron-down text-[10px]"></i></div>
+                    <div class="pl-10 py-2.5 hover:bg-gray-50"><span>商城</span></div>
+                    <div class="pl-10 py-2.5 hover:bg-gray-50"><span>回款</span></div>
+                    <div class="pl-10 py-2.5 hover:bg-gray-50"><span>购物车</span></div>
+                    <div class="pl-10 py-2.5 hover:bg-gray-50"><span>发货单</span></div>
+                    <div class="pl-10 py-2.5 hover:bg-gray-50"><span>开票申请</span></div>
+                    <div class="pl-10 py-2.5 sidebar-active"><span>销售订单</span></div>
+                    <div class="pl-10 py-2.5 hover:bg-gray-50"><span>促销活动</span></div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- 4. 右侧内容区 -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <!-- 二级工具栏 -->
+            <div class="h-9 bg-white border-b flex items-center justify-between px-4 shrink-0">
+                <div class="text-[12px] text-gray-400">工具</div>
+                <div class="flex items-center space-x-4 text-[12px] text-gray-500">
+                    <span><i class="far fa-file-alt mr-1"></i> 草稿箱</span>
+                    <span><i class="far fa-comment-dots mr-1"></i> 线上客服</span>
+                    <span><i class="fas fa-shopping-bag mr-1"></i> 购物车</span>
+                </div>
+            </div>
+
+            <!-- 主内容区域 -->
+            <main class="flex-1 overflow-hidden p-3 flex flex-col">
+                <div class="bg-white rounded border flex-1 flex flex-col shadow-sm">
+                    <!-- 筛选栏 -->
+                    <div class="p-3 border-b flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="font-bold text-gray-800 text-sm">销售订单 <span class="text-gray-400 font-normal">| 全部</span> <i class="fas fa-chevron-down text-[10px]"></i></div>
+                            <select class="border rounded px-2 py-1 text-xs text-gray-600 bg-white"><option>全部业务类型</option></select>
+                            <button class="border rounded px-3 py-1 text-xs text-gray-600 hover:bg-gray-50">筛选</button>
+                            <div class="flex items-center border rounded overflow-hidden">
+                                <span class="bg-gray-50 px-2 py-1 text-xs border-r text-gray-500">销售订单编号 <i class="fas fa-chevron-down text-[8px]"></i></span>
+                                <input type="text" placeholder="搜索" class="px-2 py-1 text-xs focus:outline-none w-48">
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="btn-orange px-4 py-1 rounded text-xs">新建</button>
+                            <div class="flex border rounded overflow-hidden">
+                                <span class="px-2 py-1 bg-orange-50 text-orange-500 text-xs border-r"><i class="fas fa-list"></i></span>
+                                <span class="px-2 py-1 text-gray-400 text-xs"><i class="fas fa-th-large"></i></span>
+                            </div>
+                            <i class="fas fa-cog text-gray-400 text-sm"></i>
+                            <i class="fas fa-redo text-gray-400 text-sm"></i>
+                        </div>
+                    </div>
+
+                    <!-- 表格 -->
+                    <div class="flex-1 overflow-auto">
+                        <table class="w-full text-[12px] border-collapse">
+                            <thead class="table-header sticky top-0 z-10 text-gray-500 border-b">
+                                <tr>
+                                    <th class="p-3 w-10"><input type="checkbox"></th>
+                                    <th class="p-3 w-10"></th>
+                                    <th class="p-3 text-left font-normal">销售订单编号</th>
+                                    <th class="p-3 text-left font-normal"><i class="fas fa-lock text-orange-300 mr-1"></i>客户名称</th>
+                                    <th class="p-3 text-left font-normal">来源</th>
+                                    <th class="p-3 text-left font-normal">下单日期</th>
+                                    <th class="p-3 text-right font-normal">产品合计</th>
+                                    <th class="p-3 text-left font-normal">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700">
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="p-3 text-center"><input type="checkbox"></td>
+                                    <td class="p-3 text-center"><i class="far fa-file-alt text-gray-400"></i></td>
+                                    <td class="p-3 text-link font-mono">20260227-000145</td>
+                                    <td class="p-3 text-link">深圳市纷享科技有限公司</td>
+                                    <td class="p-3">订货通</td>
+                                    <td class="p-3">2026-02-27</td>
+                                    <td class="p-3 text-right">70,000.00</td>
+                                    <td class="p-3">
+                                        <span class="text-link mr-3">立即付款</span>
+                                        <span class="text-link mr-3">再次下单</span>
+                                        <span class="text-link">余额扣减</span>
+                                    </td>
+                                </tr>
+                                <!-- 更多行... -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="h-10 border-t flex items-center justify-end px-4 space-x-4 text-[12px] text-gray-500">
+                        <span>共 28 条</span>
+                        <div class="flex items-center space-x-2"><span>1/2</span> <i class="fas fa-chevron-down text-[10px]"></i></div>
+                        <div class="flex items-center border rounded">
+                            <span class="px-2 py-1 border-r hover:bg-gray-50"><i class="fas fa-chevron-left"></i></span>
+                            <span class="px-2 py-1 hover:bg-gray-50"><i class="fas fa-chevron-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
